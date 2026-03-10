@@ -1,7 +1,9 @@
 import { Toaster } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import AIChatSection from "./components/AIChatSection";
 import CheckTool from "./components/CheckTool";
 import Footer from "./components/Footer";
+import HackingAttacksSection from "./components/HackingAttacksSection";
 import HeroSection from "./components/HeroSection";
 import Navigation from "./components/Navigation";
 import PricingSection from "./components/PricingSection";
@@ -19,6 +21,8 @@ export default function App() {
           <HeroSection />
           <CheckTool />
           <TipsSection />
+          <HackingAttacksSection />
+          <AIChatSection />
           <PricingSection />
           <SupportSection />
         </main>

@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 const navLinks = [
   { label: "Shield Check", href: "#check" },
   { label: "Tips", href: "#tips" },
+  { label: "Attacks", href: "#attacks" },
+  { label: "AI Assistant", href: "#ai-assistant" },
   { label: "Plans", href: "#pricing" },
   { label: "Support", href: "#support" },
 ];
@@ -43,7 +45,7 @@ export default function Navigation() {
         </a>
 
         {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden md:flex items-center gap-6">
           {navLinks.map((link) => (
             <a
               key={link.href}

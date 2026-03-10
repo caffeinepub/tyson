@@ -11,7 +11,6 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CheckCircle, Copy, Loader2 } from "lucide-react";
 import { motion } from "motion/react";
-import { QRCodeSVG } from "qrcode.react";
 import { useState } from "react";
 import { toast } from "sonner";
 import {
@@ -189,14 +188,26 @@ export default function PaymentModal({ plan, open, onClose, onUnlock }: Props) {
                           STEP 2 — SCAN & PAY {plan.price}
                         </p>
                         <div className="flex flex-col items-center gap-3 p-4 rounded-xl border border-primary/20 bg-white">
-                          <QRCodeSVG
-                            value={url}
-                            size={180}
-                            bgColor="#ffffff"
-                            fgColor="#000000"
-                            level="M"
-                            includeMargin
-                          />
+                          <div className="flex flex-col items-center gap-2 p-3">
+                            <div className="w-44 h-44 bg-gray-100 border-4 border-gray-300 rounded-lg flex items-center justify-center">
+                              <img
+                                src={`https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(url)}`}
+                                alt="QR Code"
+                                className="w-40 h-40"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.style.display = "none";
+                                  if (target.nextSibling)
+                                    (
+                                      target.nextSibling as HTMLElement
+                                    ).style.display = "block";
+                                }}
+                              />
+                              <p className="hidden text-xs text-gray-500 text-center px-2">
+                                Scan QR via {opt.label}
+                              </p>
+                            </div>
+                          </div>
                           <p className="text-xs text-gray-500 font-mono text-center">
                             Open {opt.label} → Scan → Pay
                           </p>
