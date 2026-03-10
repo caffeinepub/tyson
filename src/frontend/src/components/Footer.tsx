@@ -2,9 +2,6 @@ import { Shield } from "lucide-react";
 
 export default function Footer() {
   const year = new Date().getFullYear();
-  const hostname =
-    typeof window !== "undefined" ? window.location.hostname : "";
-  const caffeineUrl = `https://caffeine.ai?utm_source=caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(hostname)}`;
 
   return (
     <footer className="border-t border-border bg-background py-10 px-4">
@@ -46,14 +43,6 @@ export default function Footer() {
             <strong className="text-foreground/80">Rahul Parmar</strong>
           </span>
           <span>© {year} TYSON. All rights reserved.</span>
-          <a
-            href={caffeineUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-primary transition-colors"
-          >
-            Built with ❤ using caffeine.ai
-          </a>
         </div>
       </div>
     </footer>
