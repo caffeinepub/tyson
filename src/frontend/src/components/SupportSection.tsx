@@ -173,7 +173,7 @@ export default function SupportSection() {
                 WhatsApp Support
               </h3>
               <p className="text-muted-foreground text-sm mb-5 leading-relaxed">
-                Get instant help from our cyber experts. Available
+                Rahul Parmar se directly contact kr skte ho. Available
                 Monday–Saturday, 10AM–8PM IST.
               </p>
               <Button
@@ -190,6 +190,9 @@ export default function SupportSection() {
                   Chat on WhatsApp
                 </a>
               </Button>
+              <p className="text-center text-xs text-muted-foreground mt-2 font-mono">
+                💬 Rahul Parmar se seedha baat karo
+              </p>
             </div>
 
             <div className="card-cyber rounded-xl p-6">

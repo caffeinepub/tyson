@@ -1,14 +1,36 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Bot, Globe, Send, Sparkles } from "lucide-react";
+import {
+  Bot,
+  Globe,
+  Send,
+  Shield,
+  Sparkles,
+  Terminal,
+  Wifi,
+  Zap,
+} from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 
-type Language = "en" | "hi" | "es" | "fr" | "ar" | "zh" | "ja";
+type Language =
+  | "en"
+  | "hi"
+  | "es"
+  | "fr"
+  | "ar"
+  | "zh"
+  | "ja"
+  | "gu"
+  | "hary"
+  | "pa";
 
 const LANGUAGES: { code: Language; label: string; nativeLabel: string }[] = [
   { code: "en", label: "English", nativeLabel: "English" },
   { code: "hi", label: "Hindi", nativeLabel: "हिंदी" },
+  { code: "gu", label: "Gujarati", nativeLabel: "ગુજરાતી" },
+  { code: "hary", label: "Haryanvi", nativeLabel: "हरियाणवी" },
+  { code: "pa", label: "Punjabi", nativeLabel: "ਪੰਜਾਬੀ" },
   { code: "es", label: "Spanish", nativeLabel: "Español" },
   { code: "fr", label: "French", nativeLabel: "Français" },
   { code: "ar", label: "Arabic", nativeLabel: "العربية" },
@@ -33,12 +55,12 @@ const UI_TEXT: Record<
     placeholder: "Ask a cybersecurity question...",
     thinking: "Analyzing threat...",
     fallback:
-      "I specialize in cybersecurity. Try asking about firewalls, VPN, malware, phishing, ransomware, encryption, or DDoS attacks.",
+      "I specialize in cybersecurity. Try asking about firewalls, VPN, malware, phishing, ransomware, CMD troubleshooting, Wi-Fi security, password safety, slow PC fixes, or browser security.",
     suggestions: [
       "What is a VPN?",
-      "What is ransomware?",
-      "What is phishing?",
-      "How to secure my phone?",
+      "CMD troubleshoot tips",
+      "How to remove virus?",
+      "Slow PC fix",
     ],
   },
   hi: {
@@ -47,12 +69,53 @@ const UI_TEXT: Record<
     placeholder: "साइबर सुरक्षा प्रश्न पूछें...",
     thinking: "खतरे का विश्लेषण हो रहा है...",
     fallback:
-      "मैं साइबर सुरक्षा में विशेषज्ञ हूं। फ़ायरवॉल, VPN, मैलवेयर, फ़िशिंग, रैनसमवेयर, एन्क्रिप्शन या DDoS हमलों के बारे में पूछें।",
+      "मैं साइबर सुरक्षा में विशेषज्ञ हूं। फ़ायरवॉल, VPN, मैलवेयर, फ़िशिंग, रैनसमवेयर, CMD ट्रबलशूट, Wi-Fi सुरक्षा के बारे में पूछें।",
     suggestions: [
       "VPN क्या है?",
-      "रैनसमवेयर क्या है?",
-      "फ़िशिंग क्या है?",
-      "फोन को सुरक्षित कैसे करें?",
+      "CMD ट्रबलशूट?",
+      "वायरस कैसे हटाएं?",
+      "धीमा PC ठीक करें",
+    ],
+  },
+  gu: {
+    title: "AI સાઈબર સહાયક",
+    subtitle: "તમારી ભાષામાં સાઈબર સુરક્ષા વિશે પૂછો",
+    placeholder: "સાઈબર સુરક્ષા પ્રશ્ન પૂછો...",
+    thinking: "ખતરાનું વિશ્લેષણ થઈ રહ્યું છે...",
+    fallback:
+      "હું સાઈબર સુરક્ષામાં નિષ્ણાત છું. ફાયરવોલ, VPN, મૈલવેર, ફિશિંગ, રેન્સમવેર વિશે પૂછો.",
+    suggestions: [
+      "VPN શું છે?",
+      "રેન્સમવેર શું છે?",
+      "ફોન સુરક્ષિત કેવી રીતે?",
+      "CMD ટ્રબલશૂટ?",
+    ],
+  },
+  hary: {
+    title: "AI साइबर सहायक",
+    subtitle: "आपणी भाषा म्हें साइबर सुरक्षा के बारे म्हें पूछो",
+    placeholder: "साइबर सुरक्षा सवाल पूछो...",
+    thinking: "खतरे का विश्लेषण हो रह्या...",
+    fallback:
+      "म्हें साइबर सुरक्षा म्हें माहर सूं। फायरवॉल, VPN, मैलवेयर, फिशिंग के बारे म्हें पूछो।",
+    suggestions: [
+      "VPN क्या सै?",
+      "रैनसमवेयर क्या सै?",
+      "फोन नै सुरक्षित कैसे करें?",
+      "CMD ट्रबलशूट?",
+    ],
+  },
+  pa: {
+    title: "AI ਸਾਈਬਰ ਸਹਾਇਕ",
+    subtitle: "ਆਪਣੀ ਭਾਸ਼ਾ ਵਿੱਚ ਸਾਈਬਰ ਸੁਰੱਖਿਆ ਬਾਰੇ ਪੁੱਛੋ",
+    placeholder: "ਸਾਈਬਰ ਸੁਰੱਖਿਆ ਸਵਾਲ ਪੁੱਛੋ...",
+    thinking: "ਖਤਰੇ ਦਾ ਵਿਸ਼ਲੇਸ਼ਣ ਹੋ ਰਿਹਾ ਹੈ...",
+    fallback: "ਮੈਂ ਸਾਈਬਰ ਸੁਰੱਖਿਆ ਵਿੱਚ ਮਾਹਰ ਹਾਂ। ਫਾਇਰਵਾਲ, VPN, ਮਾਲਵੇਅਰ, ਫਿਸ਼ਿੰਗ ਬਾਰੇ ਪੁੱਛੋ।",
+    suggestions: [
+      "VPN ਕੀ ਹੈ?",
+      "ਰੈਨਸਮਵੇਅਰ ਕੀ ਹੈ?",
+      "ਫੋਨ ਸੁਰੱਖਿਅਤ ਕਿਵੇਂ ਕਰੀਏ?",
+      "CMD ਟ੍ਰਬਲਸ਼ੂਟ?",
     ],
   },
   es: {
@@ -132,171 +195,258 @@ type QAMap = Record<string, Record<Language, string>>;
 const KNOWLEDGE_BASE: QAMap = {
   firewall: {
     en: "A firewall is a network security device that monitors and controls incoming and outgoing network traffic based on predetermined security rules. It acts as a barrier between a trusted internal network and untrusted external networks, blocking unauthorized access while permitting legitimate communications.",
-    hi: "फ़ायरवॉल एक नेटवर्क सुरक्षा उपकरण है जो पूर्व-निर्धारित सुरक्षा नियमों के आधार पर नेटवर्क ट्रैफ़िक की निगरानी और नियंत्रण करता है। यह विश्वसनीय आंतरिक नेटवर्क और अविश्वसनीय बाहरी नेटवर्क के बीच एक अवरोध के रूप में कार्य करता है।",
-    es: "Un firewall es un dispositivo de seguridad de red que monitorea y controla el tráfico de red según reglas de seguridad predefinidas. Actúa como barrera entre una red interna de confianza y redes externas no confiables, bloqueando accesos no autorizados.",
-    fr: "Un pare-feu est un dispositif de sécurité réseau qui surveille et contrôle le trafic réseau entrant et sortant selon des règles de sécurité prédéfinies. Il agit comme une barrière entre un réseau interne de confiance et des réseaux externes non fiables.",
-    ar: "جدار الحماية هو جهاز أمان للشبكة يراقب ويتحكم في حركة مرور الشبكة الواردة والصادرة بناءً على قواعد أمان محددة مسبقاً. يعمل كحاجز بين شبكة داخلية موثوقة والشبكات الخارجية غير الموثوقة.",
-    zh: "防火墙是一种网络安全设备，根据预定义的安全规则监控和控制进出网络的流量。它充当可信内部网络与不可信外部网络之间的屏障，阻止未经授权的访问，同时允许合法通信。",
-    ja: "ファイアウォールは、事前に定義されたセキュリティルールに基づいてネットワークトラフィックを監視・制御するネットワークセキュリティデバイスです。信頼できる内部ネットワークと信頼できない外部ネットワークの間のバリアとして機能し、不正アクセスをブロックします。",
+    hi: "फ़ायरवॉल एक नेटवर्क सुरक्षा उपकरण है जो पूर्व-निर्धारित सुरक्षा नियमों के आधार पर नेटवर्क ट्रैफ़िक की निगरानी और नियंत्रण करता है।",
+    gu: "A firewall is a network security device that monitors and controls incoming and outgoing network traffic based on predetermined security rules.",
+    hary: "A firewall is a network security device that monitors and controls incoming and outgoing network traffic based on predetermined security rules.",
+    pa: "A firewall is a network security device that monitors and controls incoming and outgoing network traffic based on predetermined security rules.",
+    es: "Un firewall es un dispositivo de seguridad de red que monitorea y controla el tráfico de red según reglas de seguridad predefinidas.",
+    fr: "Un pare-feu est un dispositif de sécurité réseau qui surveille et contrôle le trafic réseau entrant et sortant selon des règles de sécurité prédéfinies.",
+    ar: "جدار الحماية هو جهاز أمان للشبكة يراقب ويتحكم في حركة مرور الشبكة.",
+    zh: "防火墙是一种网络安全设备，根据预定义的安全规则监控和控制进出网络的流量。",
+    ja: "ファイアウォールは、事前に定義されたセキュリティルールに基づいてネットワークトラフィックを監視・制御するネットワークセキュリティデバイスです。",
   },
   vpn: {
     en: "A VPN (Virtual Private Network) creates an encrypted tunnel for your internet traffic, masking your IP address and location. It protects your data on public Wi-Fi, bypasses geo-restrictions, and prevents ISPs from monitoring your browsing. Use reputable VPN services with a no-log policy for maximum privacy.",
-    hi: "VPN (वर्चुअल प्राइवेट नेटवर्क) आपके इंटरनेट ट्रैफ़िक के लिए एक एन्क्रिप्टेड टनल बनाता है, जिससे आपका IP पता और स्थान छुप जाता है। यह पब्लिक Wi-Fi पर आपके डेटा को सुरक्षित रखता है और ISP को आपकी ब्राउज़िंग से रोकता है।",
-    es: "Una VPN (Red Privada Virtual) crea un túnel cifrado para tu tráfico de internet, ocultando tu dirección IP y ubicación. Protege tus datos en Wi-Fi público y evita que los ISP monitoreen tu navegación.",
-    fr: "Un VPN (Réseau Privé Virtuel) crée un tunnel chiffré pour votre trafic internet, masquant votre adresse IP et votre localisation. Il protège vos données sur le Wi-Fi public et empêche les FAI de surveiller votre navigation.",
-    ar: "الشبكة الافتراضية الخاصة (VPN) تنشئ نفقاً مشفراً لحركة مرور الإنترنت الخاصة بك، مع إخفاء عنوان IP الخاص بك وموقعك. تحمي بياناتك على شبكة Wi-Fi العامة وتمنع مزودي خدمة الإنترنت من مراقبة تصفحك.",
-    zh: "VPN（虚拟专用网络）为您的互联网流量创建加密隧道，隐藏您的IP地址和位置。它保护您在公共Wi-Fi上的数据，防止ISP监控您的浏览活动。建议使用有不记录日志政策的可靠VPN服务。",
-    ja: "VPN（仮想プライベートネットワーク）はインターネットトラフィックのための暗号化トンネルを作成し、IPアドレスと場所を隠します。公共Wi-Fiでのデータを保護し、ISPがブラウジングを監視するのを防ぎます。",
+    hi: "VPN (वर्चुअल प्राइवेट नेटवर्क) आपके इंटरनेट ट्रैफ़िक के लिए एक एन्क्रिप्टेड टनल बनाता है, जिससे आपका IP पता और स्थान छुप जाता है।",
+    gu: "A VPN (Virtual Private Network) creates an encrypted tunnel for your internet traffic, masking your IP address and location. It protects your data on public Wi-Fi and prevents ISPs from monitoring your browsing.",
+    hary: "A VPN (Virtual Private Network) creates an encrypted tunnel for your internet traffic, masking your IP address and location. It protects your data on public Wi-Fi and prevents ISPs from monitoring your browsing.",
+    pa: "A VPN (Virtual Private Network) creates an encrypted tunnel for your internet traffic, masking your IP address and location. It protects your data on public Wi-Fi and prevents ISPs from monitoring your browsing.",
+    es: "Una VPN (Red Privada Virtual) crea un túnel cifrado para tu tráfico de internet, ocultando tu dirección IP y ubicación.",
+    fr: "Un VPN (Réseau Privé Virtuel) crée un tunnel chiffré pour votre trafic internet, masquant votre adresse IP et votre localisation.",
+    ar: "الشبكة الافتراضية الخاصة (VPN) تنشئ نفقاً مشفراً لحركة مرور الإنترنت الخاصة بك.",
+    zh: "VPN（虚拟专用网络）为您的互联网流量创建加密隧道，隐藏您的IP地址和位置。",
+    ja: "VPN（仮想プライベートネットワーク）はインターネットトラフィックのための暗号化トンネルを作成し、IPアドレスと場所を隠します。",
   },
   ransomware: {
     en: "Ransomware is malicious software that encrypts your files and demands payment (ransom) to restore access. Attackers typically spread it via phishing emails or infected downloads. Prevention: keep backups offline, update software regularly, avoid suspicious links. Never pay the ransom — it doesn't guarantee file recovery.",
-    hi: "रैनसमवेयर दुर्भावनापूर्ण सॉफ़्टवेयर है जो आपकी फ़ाइलों को एन्क्रिप्ट करता है और पहुंच बहाल करने के लिए भुगतान की मांग करता है। रोकथाम: ऑफलाइन बैकअप रखें, सॉफ़्टवेयर अपडेट करें, संदिग्ध लिंक से बचें। कभी भी फिरौती न दें।",
-    es: "El ransomware es software malicioso que cifra tus archivos y exige un pago para restaurar el acceso. Prevención: mantén copias de seguridad sin conexión, actualiza el software regularmente, evita enlaces sospechosos. Nunca pagues el rescate.",
-    fr: "Le ransomware est un logiciel malveillant qui chiffre vos fichiers et exige un paiement pour restaurer l'accès. Prévention : gardez des sauvegardes hors ligne, mettez régulièrement à jour les logiciels, évitez les liens suspects. Ne payez jamais la rançon.",
-    ar: "برنامج الفدية هو برنامج ضار يشفر ملفاتك ويطالب بالدفع لاستعادة الوصول إليها. الوقاية: احتفظ بنسخ احتياطية دون اتصال، وقم بتحديث البرامج بانتظام، وتجنب الروابط المشبوهة. لا تدفع الفدية أبداً.",
-    zh: "勒索软件是一种恶意软件，会加密您的文件并要求支付赎金才能恢复访问。预防措施：保持离线备份、定期更新软件、避免可疑链接。永远不要支付赎金，因为这不能保证文件恢复。",
-    ja: "ランサムウェアはファイルを暗号化してアクセスの回復と引き換えに身代金を要求するマルウェアです。予防策：オフラインバックアップの維持、ソフトウェアの定期更新、不審なリンクの回避。身代金は絶対に支払わないでください。",
+    hi: "रैनसमवेयर दुर्भावनापूर्ण सॉफ़्टवेयर है जो आपकी फ़ाइलों को एन्क्रिप्ट करता है और पहुंच बहाल करने के लिए भुगतान की मांग करता है। कभी भी फिरौती न दें।",
+    gu: "Ransomware is malicious software that encrypts your files and demands payment to restore access. Never pay the ransom. Keep backups offline and update software regularly.",
+    hary: "Ransomware is malicious software that encrypts your files and demands payment to restore access. Never pay the ransom. Keep backups offline and update software regularly.",
+    pa: "Ransomware is malicious software that encrypts your files and demands payment to restore access. Never pay the ransom. Keep backups offline and update software regularly.",
+    es: "El ransomware es software malicioso que cifra tus archivos y exige un pago para restaurar el acceso. Nunca pagues el rescate.",
+    fr: "Le ransomware est un logiciel malveillant qui chiffre vos fichiers et exige un paiement pour restaurer l'accès. Ne payez jamais la rançon.",
+    ar: "برنامج الفدية هو برنامج ضار يشفر ملفاتك ويطالب بالدفع لاستعادة الوصول إليها. لا تدفع الفدية أبداً.",
+    zh: "勒索软件会加密您的文件并要求支付赎金才能恢复访问。永远不要支付赎金。",
+    ja: "ランサムウェアはファイルを暗号化してアクセスの回復と引き換えに身代金を要求するマルウェアです。身代金は絶対に支払わないでください。",
   },
   sql: {
-    en: "SQL injection is an attack where malicious SQL code is inserted into input fields to manipulate a database. Attackers can steal, modify, or delete data, and even gain admin access. Prevention: use parameterized queries, input validation, and stored procedures. It's one of the most common and dangerous web vulnerabilities (OWASP Top 10).",
-    hi: "SQL इंजेक्शन एक हमला है जहाँ दुर्भावनापूर्ण SQL कोड इनपुट फ़ील्ड में डाला जाता है। हमलावर डेटा चुरा, बदल या हटा सकते हैं। रोकथाम: पैरामीटरयुक्त क्वेरी, इनपुट सत्यापन और स्टोर्ड प्रोसीजर का उपयोग करें।",
-    es: "La inyección SQL es un ataque donde se inserta código SQL malicioso en campos de entrada para manipular una base de datos. Prevención: usa consultas parametrizadas, validación de entrada y procedimientos almacenados.",
-    fr: "L'injection SQL est une attaque où du code SQL malveillant est inséré dans des champs de saisie pour manipuler une base de données. Prévention : utilisez des requêtes paramétrées, la validation des entrées et des procédures stockées.",
-    ar: "حقن SQL هو هجوم يتم فيه إدراج كود SQL ضار في حقول الإدخال للتلاعب بقاعدة البيانات. الوقاية: استخدم الاستعلامات ذات المعاملات والتحقق من الإدخال والإجراءات المخزنة.",
-    zh: "SQL注入是将恶意SQL代码插入输入字段以操纵数据库的攻击。攻击者可以窃取、修改或删除数据，甚至获得管理员访问权限。预防：使用参数化查询、输入验证和存储过程。",
-    ja: "SQLインジェクションは、悪意のあるSQLコードを入力フィールドに挿入してデータベースを操作する攻撃です。予防策：パラメータ化クエリ、入力検証、ストアドプロシージャを使用してください。",
+    en: "SQL injection is an attack where malicious SQL code is inserted into input fields to manipulate a database. Attackers can steal, modify, or delete data. Prevention: use parameterized queries, input validation, and stored procedures.",
+    hi: "SQL इंजेक्शन एक हमला है जहाँ दुर्भावनापूर्ण SQL कोड इनपुट फ़ील्ड में डाला जाता है। रोकथाम: पैरामीटरयुक्त क्वेरी और इनपुट सत्यापन उपयोग करें।",
+    gu: "SQL injection is an attack where malicious SQL code is inserted into input fields to manipulate a database. Use parameterized queries and input validation.",
+    hary: "SQL injection is an attack where malicious SQL code is inserted into input fields to manipulate a database. Use parameterized queries and input validation.",
+    pa: "SQL injection is an attack where malicious SQL code is inserted into input fields to manipulate a database. Use parameterized queries and input validation.",
+    es: "La inyección SQL es un ataque donde se inserta código SQL malicioso en campos de entrada para manipular una base de datos.",
+    fr: "L'injection SQL est une attaque où du code SQL malveillant est inséré dans des champs de saisie pour manipuler une base de données.",
+    ar: "حقن SQL هو هجوم يتم فيه إدراج كود SQL ضار في حقول الإدخال للتلاعب بقاعدة البيانات.",
+    zh: "SQL注入是将恶意SQL代码插入输入字段以操纵数据库的攻击。",
+    ja: "SQLインジェクションは、悪意のあるSQLコードを入力フィールドに挿入してデータベースを操作する攻撃です。",
   },
   phishing: {
     en: "Phishing is a social engineering attack using fake emails, messages, or websites to trick users into revealing sensitive information like passwords or credit card numbers. Red flags: urgency, generic greetings, suspicious URLs, grammar errors. Always verify sender identity and never click unsolicited links.",
-    hi: "फ़िशिंग एक सोशल इंजीनियरिंग हमला है जो नकली ईमेल या वेबसाइट का उपयोग करके उपयोगकर्ताओं को पासवर्ड या क्रेडिट कार्ड नंबर जैसी संवेदनशील जानकारी देने के लिए प्रेरित करता है। संदिग्ध URL और व्याकरण की गलतियों से सावधान रहें।",
-    es: "El phishing es un ataque de ingeniería social que usa correos electrónicos o sitios web falsos para engañar a los usuarios para que revelen información sensible. Señales de alerta: urgencia, URLs sospechosas, errores gramaticales.",
-    fr: "Le phishing est une attaque d'ingénierie sociale utilisant de faux e-mails ou sites web pour tromper les utilisateurs et leur faire révéler des informations sensibles. Signes d'alerte : urgence, URLs suspects, erreurs grammaticales.",
-    ar: "التصيد الاحتيالي هو هجوم هندسة اجتماعية يستخدم رسائل بريد إلكتروني أو مواقع ويب مزيفة لخداع المستخدمين للكشف عن معلومات حساسة. علامات التحذير: الإلحاح، عناوين URL المشبوهة، الأخطاء النحوية.",
-    zh: "网络钓鱼是利用虚假电子邮件、消息或网站欺骗用户透露密码或信用卡号等敏感信息的社会工程攻击。警示信号：紧迫感、可疑URL、语法错误。务必验证发件人身份，切勿点击不明链接。",
-    ja: "フィッシングは、偽のメールやウェブサイトを使ってユーザーからパスワードやクレジットカード番号などの機密情報を騙し取るソーシャルエンジニアリング攻撃です。注意サイン：緊急性、怪しいURL、文法エラー。",
+    hi: "फ़िशिंग एक सोशल इंजीनियरिंग हमला है जो नकली ईमेल या वेबसाइट का उपयोग करके उपयोगकर्ताओं को पासवर्ड जैसी संवेदनशील जानकारी देने के लिए प्रेरित करता है।",
+    gu: "Phishing uses fake emails or websites to trick users into revealing passwords. Always verify sender identity and never click suspicious links.",
+    hary: "Phishing uses fake emails or websites to trick users into revealing passwords. Always verify sender identity and never click suspicious links.",
+    pa: "Phishing uses fake emails or websites to trick users into revealing passwords. Always verify sender identity and never click suspicious links.",
+    es: "El phishing usa correos electrónicos o sitios web falsos para engañar a los usuarios para que revelen información sensible.",
+    fr: "Le phishing utilise de faux e-mails ou sites web pour tromper les utilisateurs et leur faire révéler des informations sensibles.",
+    ar: "التصيد الاحتيالي هو هجوم هندسة اجتماعية يستخدم رسائل بريد إلكتروني أو مواقع ويب مزيفة لخداع المستخدمين.",
+    zh: "网络钓鱼利用虚假电子邮件或网站欺骗用户透露密码等敏感信息。",
+    ja: "フィッシングは偽のメールやウェブサイトを使ってユーザーから機密情報を騙し取るソーシャルエンジニアリング攻撃です。",
   },
   malware: {
     en: "Malware (malicious software) is any software designed to harm, exploit, or otherwise compromise a device or network. Types include viruses, worms, trojans, spyware, adware, and rootkits. Protection: use updated antivirus, avoid pirated software, don't open unknown attachments, enable firewall.",
-    hi: "मैलवेयर (दुर्भावनापूर्ण सॉफ़्टवेयर) कोई भी सॉफ़्टवेयर है जो डिवाइस या नेटवर्क को नुकसान पहुंचाने के लिए डिज़ाइन किया गया है। प्रकार: वायरस, वर्म्स, ट्रोजन, स्पाइवेयर। सुरक्षा: अपडेटेड एंटीवायरस उपयोग करें, पायरेटेड सॉफ़्टवेयर से बचें।",
-    es: "El malware es cualquier software diseñado para dañar o comprometer un dispositivo. Tipos: virus, gusanos, troyanos, spyware. Protección: usa antivirus actualizado, evita software pirata, no abras archivos adjuntos desconocidos.",
-    fr: "Le malware est tout logiciel conçu pour endommager un appareil ou un réseau. Types : virus, vers, chevaux de Troie, spyware. Protection : utilisez un antivirus à jour, évitez les logiciels piratés, n'ouvrez pas les pièces jointes inconnues.",
-    ar: "البرامج الضارة هي أي برنامج مصمم لإلحاق الضرر بجهاز أو شبكة. الأنواع: الفيروسات، الديدان، أحصنة طروادة، برامج التجسس. الحماية: استخدم برنامج مكافحة فيروسات محدثاً، وتجنب البرامج المقرصنة.",
-    zh: "恶意软件是任何旨在损害、利用或破坏设备或网络的软件。类型包括：病毒、蠕虫、木马、间谍软件、广告软件和rootkit。防护：使用最新的杀毒软件、避免盗版软件、不打开未知附件。",
-    ja: "マルウェアはデバイスやネットワークに害を与えるよう設計されたソフトウェアです。種類：ウイルス、ワーム、トロイの木馬、スパイウェア。保護：最新のウイルス対策ソフトを使用し、不正コピーソフトを避け、未知の添付ファイルを開かないでください。",
+    hi: "मैलवेयर (दुर्भावनापूर्ण सॉफ़्टवेयर) कोई भी सॉफ़्टवेयर है जो डिवाइस या नेटवर्क को नुकसान पहुंचाने के लिए डिज़ाइन किया गया है। सुरक्षा: अपडेटेड एंटीवायरस उपयोग करें।",
+    gu: "Malware is any software designed to harm a device. Types include viruses, worms, trojans, spyware. Use updated antivirus and avoid pirated software.",
+    hary: "Malware is any software designed to harm a device. Types include viruses, worms, trojans, spyware. Use updated antivirus and avoid pirated software.",
+    pa: "Malware is any software designed to harm a device. Types include viruses, worms, trojans, spyware. Use updated antivirus and avoid pirated software.",
+    es: "El malware es cualquier software diseñado para dañar o comprometer un dispositivo. Tipos: virus, gusanos, troyanos, spyware.",
+    fr: "Le malware est tout logiciel conçu pour endommager un appareil ou un réseau. Types : virus, vers, chevaux de Troie, spyware.",
+    ar: "البرامج الضارة هي أي برنامج مصمم لإلحاق الضرر بجهاز أو شبكة.",
+    zh: "恶意软件是任何旨在损害设备或网络的软件。类型包括病毒、蠕虫、木马、间谍软件。",
+    ja: "マルウェアはデバイスやネットワークに害を与えるよう設計されたソフトウェアです。",
   },
   "2fa": {
-    en: "Two-Factor Authentication (2FA) adds a second layer of security beyond passwords. Even if your password is stolen, attackers need a second factor — usually a time-based code (TOTP), SMS, or biometric. Enable 2FA on all critical accounts especially email, banking, and social media. Use an authenticator app over SMS for stronger security.",
-    hi: "दो-कारक प्रमाणीकरण (2FA) पासवर्ड से परे सुरक्षा की एक दूसरी परत जोड़ता है। यदि आपका पासवर्ड चोरी हो जाता है, तो हमलावरों को दूसरे कारक की आवश्यकता होती है। सभी महत्वपूर्ण खातों पर 2FA सक्षम करें।",
-    es: "La autenticación de dos factores (2FA) agrega una segunda capa de seguridad más allá de las contraseñas. Incluso si tu contraseña es robada, los atacantes necesitan un segundo factor. Habilita 2FA en todas las cuentas críticas.",
-    fr: "L'authentification à deux facteurs (2FA) ajoute une deuxième couche de sécurité au-delà des mots de passe. Même si votre mot de passe est volé, les attaquants ont besoin d'un second facteur. Activez le 2FA sur tous les comptes critiques.",
-    ar: "المصادقة الثنائية (2FA) تضيف طبقة أمان ثانية إلى جانب كلمات المرور. حتى لو سُرقت كلمة مرورك، يحتاج المهاجمون إلى عامل ثانٍ. قم بتفعيل 2FA على جميع الحسابات المهمة.",
-    zh: "双因素认证（2FA）在密码之外增加了第二层安全防护。即使密码被盗，攻击者也需要第二个因素——通常是基于时间的代码（TOTP）、短信或生物特征。在所有重要账户上启用2FA，建议使用身份验证器应用而非短信。",
-    ja: "二要素認証（2FA）はパスワード以外に第二の安全層を追加します。パスワードが盗まれても、攻撃者には第二の要素が必要です。特にメール、銀行、SNSの重要アカウントで2FAを有効にしてください。",
+    en: "Two-Factor Authentication (2FA) adds a second layer of security beyond passwords. Even if your password is stolen, attackers need a second factor — usually a time-based code (TOTP), SMS, or biometric. Enable 2FA on all critical accounts especially email, banking, and social media.",
+    hi: "दो-कारक प्रमाणीकरण (2FA) पासवर्ड से परे सुरक्षा की एक दूसरी परत जोड़ता है। सभी महत्वपूर्ण खातों पर 2FA सक्षम करें।",
+    gu: "Two-Factor Authentication (2FA) adds a second layer of security. Enable 2FA on all critical accounts including email and banking.",
+    hary: "Two-Factor Authentication (2FA) adds a second layer of security. Enable 2FA on all critical accounts including email and banking.",
+    pa: "Two-Factor Authentication (2FA) adds a second layer of security. Enable 2FA on all critical accounts including email and banking.",
+    es: "La autenticación de dos factores (2FA) agrega una segunda capa de seguridad más allá de las contraseñas.",
+    fr: "L'authentification à deux facteurs (2FA) ajoute une deuxième couche de sécurité au-delà des mots de passe.",
+    ar: "المصادقة الثنائية (2FA) تضيف طبقة أمان ثانية إلى جانب كلمات المرور.",
+    zh: "双因素认证（2FA）在密码之外增加了第二层安全防护。",
+    ja: "二要素認証（2FA）はパスワード以外に第二の安全層を追加します。",
   },
   encryption: {
     en: "Encryption converts readable data into an unreadable format using algorithms and keys. Only authorized parties with the decryption key can access the original data. Types: symmetric (same key for encrypt/decrypt) and asymmetric (public/private key pair). Essential for protecting data in transit (HTTPS) and at rest (disk encryption).",
-    hi: "एन्क्रिप्शन एल्गोरिदम और कुंजियों का उपयोग करके पठनीय डेटा को अपठनीय प्रारूप में परिवर्तित करता है। केवल डिक्रिप्शन कुंजी वाले अधिकृत पक्ष ही मूल डेटा तक पहुंच सकते हैं।",
-    es: "El cifrado convierte datos legibles en un formato ilegible usando algoritmos y claves. Solo las partes autorizadas con la clave de descifrado pueden acceder a los datos originales. Esencial para proteger datos en tránsito y en reposo.",
-    fr: "Le chiffrement convertit des données lisibles en format illisible à l'aide d'algorithmes et de clés. Seules les parties autorisées avec la clé de déchiffrement peuvent accéder aux données originales. Essentiel pour protéger les données en transit et au repos.",
-    ar: "التشفير يحول البيانات القابلة للقراءة إلى تنسيق غير قابل للقراءة باستخدام الخوارزميات والمفاتيح. يمكن فقط للأطراف المصرح لها بمفتاح فك التشفير الوصول إلى البيانات الأصلية.",
-    zh: "加密使用算法和密钥将可读数据转换为不可读格式。只有拥有解密密钥的授权方才能访问原始数据。类型：对称加密（相同密钥）和非对称加密（公钥/私钥对）。对于保护传输中和静止状态的数据至关重要。",
-    ja: "暗号化はアルゴリズムとキーを使用して読み取り可能なデータを読み取り不可能な形式に変換します。復号化キーを持つ承認された当事者のみが元のデータにアクセスできます。HTTPSによる転送中のデータ保護と、ディスク暗号化による保存データの保護に不可欠です。",
-  },
-  darkweb: {
-    en: "The dark web is an encrypted part of the internet accessible only via special software like Tor. While it has legitimate uses (privacy, censorship bypass, journalism), it also hosts illegal marketplaces. Stolen data, credentials, and malware are frequently traded there. Monitoring services can alert you if your data appears on the dark web.",
-    hi: "डार्क वेब इंटरनेट का एन्क्रिप्टेड भाग है जो केवल Tor जैसे विशेष सॉफ़्टवेयर के माध्यम से सुलभ है। इसके वैध उपयोग हैं, लेकिन यह अवैध बाज़ारों की भी मेजबानी करता है जहाँ चोरी किया डेटा कारोबार होता है।",
-    es: "La dark web es una parte cifrada de internet accesible solo a través de software especial como Tor. Aunque tiene usos legítimos, también alberga mercados ilegales donde se comercian datos robados y credenciales.",
-    fr: "Le dark web est une partie chiffrée d'internet accessible uniquement via un logiciel spécial comme Tor. Bien qu'il ait des utilisations légitimes, il héberge également des marchés illégaux où données volées et identifiants sont échangés.",
-    ar: "الويب المظلم هو جزء مشفر من الإنترنت لا يمكن الوصول إليه إلا عبر برامج خاصة مثل Tor. على الرغم من وجود استخدامات مشروعة، إلا أنه يستضيف أيضاً أسواقاً غير مشروعة حيث يتم تداول البيانات المسروقة.",
-    zh: "暗网是互联网的加密部分，只能通过Tor等特殊软件访问。虽然有合法用途（隐私、绕过审查、新闻），但也托管着非法市场，盗窃数据和凭据在那里频繁交易。",
-    ja: "ダークウェブはTorなどの特別なソフトウェアでのみアクセスできる暗号化されたインターネットの一部です。正当な用途（プライバシー、検閲回避）もありますが、違法なマーケットプレイスも存在し、盗まれたデータが取引されています。",
-  },
-  phone: {
-    en: "To secure your phone: 1) Use a strong PIN/biometrics. 2) Enable full-disk encryption. 3) Keep OS and apps updated. 4) Only install apps from official stores. 5) Use a VPN on public Wi-Fi. 6) Enable remote wipe. 7) Be cautious of suspicious SMS links (smishing). 8) Disable Bluetooth when not in use. 9) Review app permissions regularly.",
-    hi: "फोन सुरक्षित करने के लिए: 1) मजबूत PIN/बायोमेट्रिक्स उपयोग करें। 2) फुल-डिस्क एन्क्रिप्शन सक्षम करें। 3) OS और ऐप्स को अपडेट रखें। 4) केवल आधिकारिक स्टोर से ऐप्स इंस्टॉल करें। 5) पब्लिक Wi-Fi पर VPN उपयोग करें।",
-    es: "Para asegurar tu teléfono: 1) Usa un PIN/biometría fuerte. 2) Habilita cifrado completo. 3) Mantén OS y apps actualizadas. 4) Solo instala apps de tiendas oficiales. 5) Usa VPN en Wi-Fi público. 6) Habilita borrado remoto.",
-    fr: "Pour sécuriser votre téléphone : 1) Utilisez un PIN/biométrie fort. 2) Activez le chiffrement complet. 3) Gardez l'OS et les applications à jour. 4) Installez des applications uniquement depuis les stores officiels. 5) Utilisez un VPN sur le Wi-Fi public.",
-    ar: "لتأمين هاتفك: 1) استخدم رمز PIN قوي أو المقاييس الحيوية. 2) تمكين التشفير الكامل للقرص. 3) إبقاء نظام التشغيل والتطبيقات محدثة. 4) تثبيت التطبيقات من المتاجر الرسمية فقط. 5) استخدم VPN على شبكة Wi-Fi العامة.",
-    zh: "保护手机的方法：1) 使用强密码/生物识别。2) 启用全盘加密。3) 保持操作系统和应用程序更新。4) 只从官方商店安装应用。5) 在公共Wi-Fi使用VPN。6) 启用远程擦除。7) 警惕可疑短信链接。",
-    ja: "スマホを安全にするには：1) 強力なPIN/生体認証を使用する。2) フルディスク暗号化を有効にする。3) OSとアプリを常に更新する。4) 公式ストアからのみアプリをインストールする。5) 公共Wi-FiではVPNを使用する。6) リモートワイプを有効にする。",
+    hi: "एन्क्रिप्शन एल्गोरिदम और कुंजियों का उपयोग करके पठनीय डेटा को अपठनीय प्रारूप में परिवर्तित करता है।",
+    gu: "Encryption converts readable data into an unreadable format using algorithms and keys. Essential for HTTPS and disk encryption.",
+    hary: "Encryption converts readable data into an unreadable format using algorithms and keys. Essential for HTTPS and disk encryption.",
+    pa: "Encryption converts readable data into an unreadable format using algorithms and keys. Essential for HTTPS and disk encryption.",
+    es: "El cifrado convierte datos legibles en un formato ilegible usando algoritmos y claves.",
+    fr: "Le chiffrement convertit des données lisibles en un format illisible à l'aide d'algorithmes et de clés.",
+    ar: "التشفير يحوّل البيانات القابلة للقراءة إلى تنسيق غير قابل للقراءة باستخدام الخوارزميات والمفاتيح.",
+    zh: "加密使用算法和密钥将可读数据转换为不可读格式。",
+    ja: "暗号化はアルゴリズムと鍵を使って読み取り可能なデータを読み取り不可能な形式に変換します。",
   },
   ddos: {
-    en: "A DDoS (Distributed Denial of Service) attack floods a server with massive traffic from thousands of compromised devices (botnets), making it unavailable to legitimate users. Mitigation: CDN with DDoS protection (Cloudflare), rate limiting, traffic filtering, and scalable cloud infrastructure. It can take down entire websites in minutes.",
-    hi: "DDoS (वितरित सेवा अस्वीकृति) हमला हजारों समझौता किए गए उपकरणों से सर्वर पर भारी ट्रैफ़िक भेजता है, जिससे वैध उपयोगकर्ताओं के लिए सेवा अनुपलब्ध हो जाती है। समाधान: Cloudflare, रेट लिमिटिंग, ट्रैफ़िक फ़िल्टरिंग।",
-    es: "Un ataque DDoS inunda un servidor con tráfico masivo de miles de dispositivos comprometidos, haciéndolo no disponible para usuarios legítimos. Mitigación: CDN con protección DDoS, limitación de velocidad, filtrado de tráfico.",
-    fr: "Une attaque DDoS inonde un serveur avec un trafic massif provenant de milliers d'appareils compromis, le rendant indisponible pour les utilisateurs légitimes. Atténuation : CDN avec protection DDoS, limitation de débit, filtrage du trafic.",
-    ar: "هجوم DDoS يغمر الخادم بحركة مرور هائلة من آلاف الأجهزة المخترقة، مما يجعله غير متاح للمستخدمين الشرعيين. التخفيف: CDN مع حماية من DDoS، تحديد معدل الطلبات، تصفية حركة المرور.",
-    zh: "DDoS（分布式拒绝服务）攻击用来自数千个受损设备（僵尸网络）的大量流量淹没服务器，使其对合法用户不可用。缓解措施：带DDoS保护的CDN（Cloudflare）、速率限制、流量过滤。",
-    ja: "DDoS（分散型サービス拒否）攻撃は、数千の侵害されたデバイス（ボットネット）から大量のトラフィックをサーバーに送り付け、正当なユーザーが利用できなくします。対策：DDoS保護付きCDN（Cloudflare）、レート制限、トラフィックフィルタリング。",
+    en: "A DDoS (Distributed Denial of Service) attack overwhelms a server with traffic from multiple sources, making it unavailable. Protection: use CDN providers (Cloudflare), rate limiting, traffic filtering, and DDoS-mitigating hosting. It's a common attack against websites and online services.",
+    hi: "DDoS (डिस्ट्रीब्यूटेड डिनायल ऑफ सर्विस) हमला कई स्रोतों से ट्रैफिक से सर्वर को अभिभूत करता है। सुरक्षा: CDN और रेट लिमिटिंग का उपयोग करें।",
+    gu: "A DDoS attack overwhelms a server with traffic making it unavailable. Use CDN providers like Cloudflare for protection.",
+    hary: "A DDoS attack overwhelms a server with traffic making it unavailable. Use CDN providers like Cloudflare for protection.",
+    pa: "A DDoS attack overwhelms a server with traffic making it unavailable. Use CDN providers like Cloudflare for protection.",
+    es: "Un ataque DDoS abruma un servidor con tráfico de múltiples fuentes. Protección: usa proveedores CDN, limitación de velocidad.",
+    fr: "Une attaque DDoS submerge un serveur avec du trafic provenant de plusieurs sources. Protection : utilisez des CDN, limitez le débit.",
+    ar: "هجوم DDoS يُغرق خادماً بحركة مرور من مصادر متعددة. الحماية: استخدم مزودي CDN وتحديد المعدل.",
+    zh: "DDoS攻击用来自多个来源的流量淹没服务器。防护：使用CDN提供商（Cloudflare）、速率限制。",
+    ja: "DDoS攻撃は複数のソースからのトラフィックでサーバーを圧倒します。保護：CDNプロバイダーとレート制限を使用してください。",
   },
-  social: {
-    en: "Social engineering exploits human psychology rather than technical vulnerabilities. Attackers manipulate people through trust, fear, urgency, or authority to gain access or information. Types: phishing, pretexting, baiting, tailgating. Defense: security awareness training, verify identity before sharing info, be skeptical of unsolicited contacts.",
-    hi: "सोशल इंजीनियरिंग तकनीकी कमजोरियों के बजाय मानव मनोविज्ञान का शोषण करती है। हमलावर विश्वास, भय, तात्कालिकता के माध्यम से लोगों को जोड़-तोड़कर पहुंच या जानकारी प्राप्त करते हैं। बचाव: सुरक्षा जागरूकता प्रशिक्षण।",
-    es: "La ingeniería social explota la psicología humana en lugar de vulnerabilidades técnicas. Los atacantes manipulan a las personas mediante confianza, miedo o urgencia. Defensa: formación en concienciación sobre seguridad, verificar identidad antes de compartir información.",
-    fr: "L'ingénierie sociale exploite la psychologie humaine plutôt que les vulnérabilités techniques. Les attaquants manipulent les gens par la confiance, la peur ou l'urgence. Défense : formation à la sensibilisation à la sécurité, vérifier l'identité avant de partager des informations.",
-    ar: "الهندسة الاجتماعية تستغل علم النفس البشري بدلاً من الثغرات التقنية. يتلاعب المهاجمون بالناس من خلال الثقة والخوف والإلحاح. الدفاع: التدريب على التوعية الأمنية، والتحقق من الهوية قبل مشاركة المعلومات.",
-    zh: "社会工程学利用人类心理而非技术漏洞。攻击者通过信任、恐惧、紧迫感或权威来操纵人们获取访问权或信息。类型：网络钓鱼、假托、诱骗、尾随。防御：安全意识培训、验证身份后再分享信息。",
-    ja: "ソーシャルエンジニアリングは技術的な脆弱性ではなく人間心理を悪用します。攻撃者は信頼、恐怖、緊急性を通じて人々を操作してアクセスや情報を得ます。防御：セキュリティ意識向上トレーニング、情報共有前の身元確認。",
+  cmd: {
+    en: "Common CMD commands for troubleshooting:\n1) `ipconfig /all` — view network config\n2) `ping google.com` — test internet connection\n3) `netstat -an` — see all open ports\n4) `sfc /scannow` — scan and fix Windows files\n5) `chkdsk /f` — fix disk errors\n6) `tasklist` — see running processes\n7) `netsh wlan show profiles` — see saved Wi-Fi\n8) `tracert google.com` — trace network route\n9) `arp -a` — see ARP table\n10) `nslookup domain.com` — DNS lookup\n\nTip: Run CMD as Administrator for best results!",
+    hi: "CMD ट्रबलशूटिंग कमांड:\n1) `ipconfig /all` — नेटवर्क कॉन्फिग देखें\n2) `ping google.com` — इंटरनेट टेस्ट करें\n3) `netstat -an` — खुले पोर्ट देखें\n4) `sfc /scannow` — Windows फाइलें स्कैन करें\n5) `chkdsk /f` — डिस्क त्रुटियां ठीक करें\n6) `tasklist` — चलती प्रक्रियाएं देखें\n7) `netsh wlan show profiles` — Wi-Fi प्रोफाइल देखें\n8) `tracert google.com` — नेटवर्क रूट ट्रेस\n9) `arp -a` — ARP टेबल\n10) `nslookup domain.com` — DNS लुकअप\n\nव्यवस्थापक के रूप में CMD चलाएं।",
+    gu: "Common CMD commands for troubleshooting:\n1) `ipconfig /all` — view network config\n2) `ping google.com` — test internet connection\n3) `netstat -an` — see all open ports\n4) `sfc /scannow` — scan and fix Windows files\n5) `chkdsk /f` — fix disk errors\n6) `tasklist` — see running processes\n7) `tracert google.com` — trace network route\n\nRun CMD as Administrator for best results!",
+    hary: "Common CMD commands for troubleshooting:\n1) `ipconfig /all` — view network config\n2) `ping google.com` — test internet connection\n3) `netstat -an` — see all open ports\n4) `sfc /scannow` — scan and fix Windows files\n5) `chkdsk /f` — fix disk errors\n\nRun CMD as Administrator for best results!",
+    pa: "Common CMD commands for troubleshooting:\n1) `ipconfig /all` — view network config\n2) `ping google.com` — test internet connection\n3) `netstat -an` — see all open ports\n4) `sfc /scannow` — scan and fix Windows files\n5) `chkdsk /f` — fix disk errors\n\nRun CMD as Administrator for best results!",
+    es: "Comandos CMD para solución de problemas:\n1) `ipconfig /all` — ver config de red\n2) `ping google.com` — probar internet\n3) `netstat -an` — ver puertos abiertos\n4) `sfc /scannow` — escanear archivos Windows\n5) `tracert google.com` — rastrear ruta de red",
+    fr: "Commandes CMD pour le dépannage:\n1) `ipconfig /all` — voir la config réseau\n2) `ping google.com` — tester internet\n3) `netstat -an` — voir les ports ouverts\n4) `sfc /scannow` — analyser les fichiers Windows\n5) `tracert google.com` — tracer la route réseau",
+    ar: "أوامر CMD لاستكشاف الأخطاء:\n1) `ipconfig /all` — عرض إعدادات الشبكة\n2) `ping google.com` — اختبار الإنترنت\n3) `netstat -an` — رؤية المنافذ المفتوحة\n4) `sfc /scannow` — فحص ملفات Windows",
+    zh: "CMD故障排除命令:\n1) `ipconfig /all` — 查看网络配置\n2) `ping google.com` — 测试网络\n3) `netstat -an` — 查看开放端口\n4) `sfc /scannow` — 扫描修复Windows文件\n5) `tracert google.com` — 跟踪网络路由\n\n以管理员身份运行CMD效果最佳！",
+    ja: "CMDトラブルシューティングコマンド:\n1) `ipconfig /all` — ネットワーク設定表示\n2) `ping google.com` — インターネットテスト\n3) `netstat -an` — 開いているポートを表示\n4) `sfc /scannow` — Windowsファイルをスキャン\n5) `tracert google.com` — ネットワークルートを追跡\n\n管理者としてCMDを実行してください！",
+  },
+  virus_removal: {
+    en: "Virus removal steps:\n1) Disconnect from internet immediately\n2) Boot into Safe Mode (press F8 on startup)\n3) Run full scan with Windows Defender or Malwarebytes\n4) Check startup programs: `msconfig` → Startup tab\n5) Delete temp files: type `%temp%` in Run dialog\n6) Check Task Manager for suspicious processes\n7) Update all software after cleaning\n8) Change all passwords from a clean device\n9) Consider full reinstall if infection persists\n\nFree tools: Malwarebytes, Windows Defender, HitmanPro",
+    hi: "वायरस हटाने के चरण:\n1) तुरंत इंटरनेट डिस्कनेक्ट करें\n2) Safe Mode में बूट करें (F8 दबाएं)\n3) Windows Defender या Malwarebytes से पूर्ण स्कैन करें\n4) `msconfig` से स्टार्टअप प्रोग्राम जांचें\n5) `%temp%` में अस्थायी फाइलें हटाएं\n6) Task Manager में संदिग्ध प्रक्रियाएं जांचें\n7) सफाई के बाद सभी पासवर्ड बदलें",
+    gu: "Virus removal steps:\n1) Disconnect from internet immediately\n2) Boot into Safe Mode (F8 on startup)\n3) Run full scan with Windows Defender or Malwarebytes\n4) Delete temp files: `%temp%` in Run dialog\n5) Check startup programs via `msconfig`\n6) Change all passwords after cleaning",
+    hary: "Virus removal steps:\n1) Disconnect from internet immediately\n2) Boot into Safe Mode (F8 on startup)\n3) Run full scan with Windows Defender or Malwarebytes\n4) Delete temp files: `%temp%` in Run dialog\n5) Check startup programs via `msconfig`\n6) Change all passwords after cleaning",
+    pa: "Virus removal steps:\n1) Disconnect from internet immediately\n2) Boot into Safe Mode (F8 on startup)\n3) Run full scan with Windows Defender or Malwarebytes\n4) Delete temp files: `%temp%` in Run dialog\n5) Check startup programs via `msconfig`\n6) Change all passwords after cleaning",
+    es: "Pasos para eliminar virus:\n1) Desconecta de internet inmediatamente\n2) Inicia en Modo Seguro (F8)\n3) Ejecuta análisis completo con Windows Defender o Malwarebytes\n4) Revisa programas de inicio: `msconfig`\n5) Elimina archivos temporales: `%temp%`",
+    fr: "Étapes de suppression de virus:\n1) Déconnecter d'internet immédiatement\n2) Démarrer en Mode sans échec (F8)\n3) Lancer une analyse complète avec Windows Defender ou Malwarebytes\n4) Vérifier les programmes de démarrage: `msconfig`",
+    ar: "خطوات إزالة الفيروسات:\n1) قطع الاتصال بالإنترنت فوراً\n2) التشغيل في الوضع الآمن (F8)\n3) إجراء فحص كامل بـ Windows Defender أو Malwarebytes\n4) حذف الملفات المؤقتة: `%temp%`",
+    zh: "病毒清除步骤:\n1) 立即断开网络连接\n2) 进入安全模式（F8）\n3) 使用Windows Defender或Malwarebytes全面扫描\n4) 检查启动程序：`msconfig`\n5) 删除临时文件：`%temp%`\n6) 清理后更改所有密码",
+    ja: "ウイルス除去手順:\n1) すぐにインターネット接続を切断\n2) セーフモードで起動（F8キー）\n3) Windows DefenderまたはMalwarebytesで完全スキャン\n4) スタートアッププログラムを確認：`msconfig`\n5) 一時ファイルを削除：`%temp%`",
+  },
+  wifi: {
+    en: "Wi-Fi security & troubleshooting:\n1) Use WPA3 or WPA2 encryption (avoid WEP)\n2) Change default router password\n3) Use a strong Wi-Fi passphrase (12+ chars)\n4) Enable firewall on router\n5) Disable WPS (vulnerable to brute force)\n\nFor connection issues:\n- Restart router\n- Run `ipconfig /release` then `ipconfig /renew`\n- Check `netsh wlan show interfaces`\n- Use `netsh wlan disconnect` and reconnect\n- Update router firmware\n- Use 5GHz band for better security",
+    hi: "Wi-Fi सुरक्षा और ट्रबलशूटिंग:\n1) WPA3 या WPA2 एन्क्रिप्शन उपयोग करें\n2) डिफ़ॉल्ट राउटर पासवर्ड बदलें\n3) मजबूत पासफ्रेज़ उपयोग करें\n4) WPS अक्षम करें\n\nकनेक्शन समस्या के लिए:\n- `ipconfig /release` फिर `ipconfig /renew` चलाएं",
+    gu: "Wi-Fi security & troubleshooting:\n1) Use WPA3 or WPA2 encryption (avoid WEP)\n2) Change default router password\n3) Disable WPS\n4) For issues: `ipconfig /release` then `ipconfig /renew`\n5) Update router firmware",
+    hary: "Wi-Fi security & troubleshooting:\n1) Use WPA3 or WPA2 encryption (avoid WEP)\n2) Change default router password\n3) Disable WPS\n4) For issues: `ipconfig /release` then `ipconfig /renew`\n5) Update router firmware",
+    pa: "Wi-Fi security & troubleshooting:\n1) Use WPA3 or WPA2 encryption (avoid WEP)\n2) Change default router password\n3) Disable WPS\n4) For issues: `ipconfig /release` then `ipconfig /renew`\n5) Update router firmware",
+    es: "Seguridad y solución de problemas Wi-Fi:\n1) Usa cifrado WPA3 o WPA2\n2) Cambia la contraseña del router\n3) Deshabilita WPS\n4) Para problemas: `ipconfig /release` luego `ipconfig /renew`",
+    fr: "Sécurité et dépannage Wi-Fi:\n1) Utiliser le chiffrement WPA3 ou WPA2\n2) Changer le mot de passe du routeur par défaut\n3) Désactiver WPS\n4) Pour les problèmes: `ipconfig /release` puis `ipconfig /renew`",
+    ar: "أمان Wi-Fi واستكشاف الأخطاء:\n1) استخدم تشفير WPA3 أو WPA2\n2) غيّر كلمة مرور الراوتر الافتراضية\n3) عطّل WPS\n4) لمشاكل الاتصال: `ipconfig /release` ثم `ipconfig /renew`",
+    zh: "Wi-Fi安全与故障排除:\n1) 使用WPA3或WPA2加密\n2) 更改路由器默认密码\n3) 禁用WPS\n4) 连接问题：`ipconfig /release`然后`ipconfig /renew`\n5) 更新路由器固件",
+    ja: "Wi-Fiセキュリティとトラブルシューティング:\n1) WPA3またはWPA2暗号化を使用\n2) ルーターのデフォルトパスワードを変更\n3) WPSを無効化\n4) 接続問題：`ipconfig /release`後に`ipconfig /renew`",
+  },
+  password: {
+    en: "Password security best practices:\n1) Use 12+ character passwords with mix of upper/lower/numbers/symbols\n2) Never reuse passwords across sites\n3) Use a password manager (Bitwarden, 1Password)\n4) Enable 2FA everywhere\n5) Forgot Windows password: boot with recovery drive or use `net user username newpassword` from recovery CMD\n6) Check for leaked passwords at haveibeenpwned.com\n7) Use passphrases (4+ random words) for memorability\n8) Change passwords every 6-12 months for critical accounts",
+    hi: "पासवर्ड सुरक्षा:\n1) 12+ वर्णों का पासवर्ड उपयोग करें\n2) एक ही पासवर्ड कई साइटों पर न दोहराएं\n3) पासवर्ड मैनेजर (Bitwarden) उपयोग करें\n4) Windows पासवर्ड भूल गए: रिकवरी CMD में `net user username newpassword` चलाएं\n5) haveibeenpwned.com पर लीक की जांच करें",
+    gu: "Password security best practices:\n1) Use 12+ character passwords\n2) Never reuse passwords\n3) Use a password manager (Bitwarden)\n4) Enable 2FA everywhere\n5) Check haveibeenpwned.com for leaked passwords",
+    hary: "Password security best practices:\n1) Use 12+ character passwords\n2) Never reuse passwords\n3) Use a password manager (Bitwarden)\n4) Enable 2FA everywhere\n5) Check haveibeenpwned.com for leaked passwords",
+    pa: "Password security best practices:\n1) Use 12+ character passwords\n2) Never reuse passwords\n3) Use a password manager (Bitwarden)\n4) Enable 2FA everywhere\n5) Check haveibeenpwned.com for leaked passwords",
+    es: "Mejores prácticas de seguridad de contraseñas:\n1) Usa contraseñas de 12+ caracteres\n2) Nunca reutilices contraseñas\n3) Usa un gestor de contraseñas (Bitwarden)\n4) Activa 2FA en todas partes",
+    fr: "Meilleures pratiques de sécurité des mots de passe:\n1) Utilisez des mots de passe de 12+ caractères\n2) Ne réutilisez jamais les mots de passe\n3) Utilisez un gestionnaire de mots de passe (Bitwarden)\n4) Activez le 2FA partout",
+    ar: "أفضل ممارسات أمان كلمات المرور:\n1) استخدم كلمات مرور من 12+ حرفاً\n2) لا تعيد استخدام كلمات المرور\n3) استخدم مدير كلمات المرور (Bitwarden)\n4) فعّل المصادقة الثنائية في كل مكان",
+    zh: "密码安全最佳实践:\n1) 使用12+字符密码\n2) 不要重复使用密码\n3) 使用密码管理器（Bitwarden）\n4) 到处启用2FA\n5) 在haveibeenpwned.com检查密码泄露",
+    ja: "パスワードセキュリティのベストプラクティス:\n1) 12文字以上のパスワードを使用\n2) パスワードを使い回さない\n3) パスワードマネージャーを使用（Bitwarden）\n4) どこでも2FAを有効化\n5) haveibeenpwned.comで流出確認",
+  },
+  slow_pc: {
+    en: "Fix slow PC/device:\n1) Open Task Manager (Ctrl+Shift+Esc) — kill high CPU/RAM processes\n2) Run `cleanmgr` (Disk Cleanup)\n3) Disable startup programs: Task Manager → Startup tab\n4) Run `sfc /scannow` in admin CMD\n5) Check for malware with Malwarebytes\n6) Defrag HDD: `defrag C: /U /V` (not for SSD)\n7) Add more RAM or upgrade to SSD\n8) Update Windows and drivers\n9) Check disk health: `wmic diskdrive get status`\n10) Clear browser cache and extensions",
+    hi: "धीमे PC को ठीक करें:\n1) Task Manager खोलें (Ctrl+Shift+Esc) — उच्च CPU प्रक्रियाएं बंद करें\n2) `cleanmgr` चलाएं\n3) स्टार्टअप प्रोग्राम अक्षम करें\n4) `sfc /scannow` चलाएं\n5) Malwarebytes से मैलवेयर जांचें",
+    gu: "Fix slow PC:\n1) Open Task Manager (Ctrl+Shift+Esc) — kill high CPU processes\n2) Run `cleanmgr` (Disk Cleanup)\n3) Disable startup programs\n4) Run `sfc /scannow` in admin CMD\n5) Check for malware with Malwarebytes",
+    hary: "Fix slow PC:\n1) Open Task Manager (Ctrl+Shift+Esc) — kill high CPU processes\n2) Run `cleanmgr` (Disk Cleanup)\n3) Disable startup programs\n4) Run `sfc /scannow` in admin CMD\n5) Check for malware with Malwarebytes",
+    pa: "Fix slow PC:\n1) Open Task Manager (Ctrl+Shift+Esc) — kill high CPU processes\n2) Run `cleanmgr` (Disk Cleanup)\n3) Disable startup programs\n4) Run `sfc /scannow` in admin CMD\n5) Check for malware with Malwarebytes",
+    es: "Reparar PC lenta:\n1) Abre el Administrador de tareas (Ctrl+Shift+Esc)\n2) Ejecuta `cleanmgr`\n3) Deshabilita programas de inicio\n4) Ejecuta `sfc /scannow` como administrador",
+    fr: "Réparer un PC lent:\n1) Ouvrir le Gestionnaire des tâches (Ctrl+Shift+Esc)\n2) Exécuter `cleanmgr`\n3) Désactiver les programmes de démarrage\n4) Exécuter `sfc /scannow` en admin",
+    ar: "إصلاح الكمبيوتر البطيء:\n1) افتح مدير المهام (Ctrl+Shift+Esc)\n2) شغّل `cleanmgr`\n3) عطّل برامج البدء التلقائي\n4) شغّل `sfc /scannow` كمسؤول",
+    zh: "修复慢速PC:\n1) 打开任务管理器（Ctrl+Shift+Esc）— 终止高CPU进程\n2) 运行`cleanmgr`（磁盘清理）\n3) 禁用启动程序\n4) 以管理员身份运行`sfc /scannow`\n5) 使用Malwarebytes检查恶意软件",
+    ja: "スローPCを修正:\n1) タスクマネージャーを開く（Ctrl+Shift+Esc）\n2) `cleanmgr`を実行\n3) スタートアッププログラムを無効化\n4) 管理者CMDで`sfc /scannow`を実行\n5) Malwarebytesでマルウェアチェック",
+  },
+  browser: {
+    en: "Browser security tips:\n1) Always use HTTPS (look for padlock icon)\n2) Keep browser updated\n3) Install uBlock Origin for ad/malware blocking\n4) Disable or review extensions regularly\n5) Use private/incognito mode on shared devices\n6) Clear cookies/cache monthly\n7) Never save passwords in browser — use a password manager\n8) Check site safety via Google Safe Browsing\n9) Use separate browsers for banking vs general browsing",
+    hi: "ब्राउज़र सुरक्षा:\n1) हमेशा HTTPS उपयोग करें\n2) ब्राउज़र अपडेट रखें\n3) uBlock Origin इंस्टॉल करें\n4) एक्सटेंशन नियमित जांचें\n5) ब्राउज़र में पासवर्ड सहेजें नहीं — पासवर्ड मैनेजर उपयोग करें",
+    gu: "Browser security tips:\n1) Always use HTTPS\n2) Keep browser updated\n3) Install uBlock Origin\n4) Never save passwords in browser — use a password manager\n5) Use private mode on shared devices",
+    hary: "Browser security tips:\n1) Always use HTTPS\n2) Keep browser updated\n3) Install uBlock Origin\n4) Never save passwords in browser — use a password manager\n5) Use private mode on shared devices",
+    pa: "Browser security tips:\n1) Always use HTTPS\n2) Keep browser updated\n3) Install uBlock Origin\n4) Never save passwords in browser — use a password manager\n5) Use private mode on shared devices",
+    es: "Consejos de seguridad del navegador:\n1) Usa siempre HTTPS\n2) Mantén el navegador actualizado\n3) Instala uBlock Origin\n4) Nunca guardes contraseñas en el navegador",
+    fr: "Conseils de sécurité du navigateur:\n1) Toujours utiliser HTTPS\n2) Maintenir le navigateur à jour\n3) Installer uBlock Origin\n4) Ne jamais enregistrer de mots de passe dans le navigateur",
+    ar: "نصائح أمان المتصفح:\n1) استخدم HTTPS دائماً\n2) حافظ على تحديث المتصفح\n3) ثبّت uBlock Origin\n4) لا تحفظ كلمات المرور في المتصفح",
+    zh: "浏览器安全提示:\n1) 始终使用HTTPS\n2) 保持浏览器更新\n3) 安装uBlock Origin\n4) 定期检查扩展程序\n5) 不要在浏览器中保存密码 — 使用密码管理器",
+    ja: "ブラウザセキュリティのヒント:\n1) 常にHTTPSを使用\n2) ブラウザを最新状態に保つ\n3) uBlock Originをインストール\n4) ブラウザにパスワードを保存しない — パスワードマネージャーを使用",
   },
 };
 
 const KEYWORD_MAP: Record<string, string> = {
   firewall: "firewall",
   "fire wall": "firewall",
+  फ़ायरवॉल: "firewall",
   vpn: "vpn",
   "virtual private": "vpn",
   ransomware: "ransomware",
   ransom: "ransomware",
+  रैनसमवेयर: "ransomware",
   sql: "sql",
   "sql injection": "sql",
+  injection: "sql",
   phishing: "phishing",
+  फ़िशिंग: "phishing",
   malware: "malware",
+  मैलवेयर: "malware",
   "2fa": "2fa",
   "two factor": "2fa",
-  "two-factor": "2fa",
-  "dvi faktor": "2fa",
-  encryption: "encryption",
+  "multi factor": "2fa",
+  authentication: "2fa",
   encrypt: "encryption",
-  darkweb: "darkweb",
-  "dark web": "darkweb",
-  phone: "phone",
-  mobile: "phone",
-  smartphone: "phone",
+  encryption: "encryption",
+  एन्क्रिप्शन: "encryption",
   ddos: "ddos",
   "denial of service": "ddos",
-  "social engineering": "social",
-  "social engineer": "social",
-  // Hindi keywords
-  "vpn क्या": "vpn",
-  रैनसमवेयर: "ransomware",
-  फ़िशिंग: "phishing",
-  फोन: "phone",
-  फ़ायरवॉल: "firewall",
-  मैलवेयर: "malware",
-  एन्क्रिप्शन: "encryption",
-  // Spanish keywords
-  cortafuegos: "firewall",
-  cifrado: "encryption",
-  "ingeniería social": "social",
-  // French keywords
-  "pare-feu": "firewall",
-  chiffrement: "encryption",
-  // Chinese keywords
-  防火墙: "firewall",
-  加密: "encryption",
-  勒索软件: "ransomware",
-  网络钓鱼: "phishing",
-  // Japanese keywords
-  ファイアウォール: "firewall",
-  暗号化: "encryption",
-  ランサムウェア: "ransomware",
-  フィッシング: "phishing",
+  // CMD / troubleshooting
+  cmd: "cmd",
+  "command prompt": "cmd",
+  ipconfig: "cmd",
+  netstat: "cmd",
+  sfc: "cmd",
+  tracert: "cmd",
+  ping: "cmd",
+  "windows command": "cmd",
+  troubleshoot: "cmd",
+  ट्रबलशूट: "cmd",
+  कमांड: "cmd",
+  // Virus removal
+  "virus removal": "virus_removal",
+  "remove virus": "virus_removal",
+  "virus clean": "virus_removal",
+  malwarebytes: "virus_removal",
+  "safe mode": "virus_removal",
+  "वायरस हटाएं": "virus_removal",
+  // Wi-Fi
+  wifi: "wifi",
+  "wi-fi": "wifi",
+  wireless: "wifi",
+  router: "wifi",
+  "internet not working": "wifi",
+  "no internet": "wifi",
+  // Password
+  password: "password",
+  pass: "password",
+  पासवर्ड: "password",
+  // Slow PC
+  "slow pc": "slow_pc",
+  "slow computer": "slow_pc",
+  "pc slow": "slow_pc",
+  "slow phone": "slow_pc",
+  "device slow": "slow_pc",
+  // Browser
+  browser: "browser",
+  chrome: "browser",
+  firefox: "browser",
+  ब्राउज़र: "browser",
 };
 
-function findAnswer(question: string, lang: Language): string | null {
-  const q = question.toLowerCase();
-  for (const [keyword, key] of Object.entries(KEYWORD_MAP)) {
-    if (q.includes(keyword)) {
+function findAnswer(query: string, lang: Language): string | null {
+  const q = query.toLowerCase();
+  for (const [kw, key] of Object.entries(KEYWORD_MAP)) {
+    if (q.includes(kw)) {
       return KNOWLEDGE_BASE[key]?.[lang] ?? null;
     }
   }
@@ -312,6 +462,46 @@ interface Message {
 }
 
 let msgIdCounter = 0;
+
+// Floating orb animation CSS
+const orbKeyframes = `
+@keyframes floatOrb1 {
+  0%, 100% { transform: translateY(0px) translateX(0px) scale(1); opacity: 0.4; }
+  33% { transform: translateY(-18px) translateX(8px) scale(1.08); opacity: 0.7; }
+  66% { transform: translateY(10px) translateX(-6px) scale(0.95); opacity: 0.3; }
+}
+@keyframes floatOrb2 {
+  0%, 100% { transform: translateY(0px) translateX(0px) scale(1); opacity: 0.3; }
+  40% { transform: translateY(15px) translateX(-10px) scale(1.1); opacity: 0.6; }
+  70% { transform: translateY(-8px) translateX(12px) scale(0.92); opacity: 0.5; }
+}
+@keyframes floatOrb3 {
+  0%, 100% { transform: translateY(0px) translateX(0px) scale(1); opacity: 0.25; }
+  50% { transform: translateY(-12px) translateX(5px) scale(1.05); opacity: 0.55; }
+}
+@keyframes scanLine {
+  0% { top: 0%; opacity: 0.9; }
+  95% { top: 100%; opacity: 0.5; }
+  100% { top: 100%; opacity: 0; }
+}
+@keyframes borderGlow {
+  0%, 100% { border-color: oklch(0.55 0.22 25); box-shadow: 0 0 10px oklch(0.55 0.22 25 / 0.4); }
+  33% { border-color: oklch(0.55 0.18 280); box-shadow: 0 0 18px oklch(0.55 0.18 280 / 0.4); }
+  66% { border-color: oklch(0.55 0.20 160); box-shadow: 0 0 14px oklch(0.55 0.20 160 / 0.4); }
+}
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 12px oklch(0.55 0.22 25 / 0.5); }
+  50% { box-shadow: 0 0 28px oklch(0.55 0.22 25 / 0.9); }
+}
+@keyframes matrixRain {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 0% 100%; }
+}
+`;
 
 export default function AIChatSection() {
   const [lang, setLang] = useState<Language>("en");
@@ -356,7 +546,7 @@ export default function AIChatSection() {
     }, 15);
   };
 
-  const sendMessage = (text: string) => {
+  const sendMessage = async (text: string) => {
     const trimmed = text.trim();
     if (!trimmed || isThinking) return;
     setInput("");
@@ -369,7 +559,43 @@ export default function AIChatSection() {
     setMessages((prev) => [...prev, userMsg]);
     setIsThinking(true);
 
-    setTimeout(() => {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      const res = await fetch("https://text.pollinations.ai/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        signal: controller.signal,
+        body: JSON.stringify({
+          messages: [
+            {
+              role: "system",
+              content:
+                "You are a cybersecurity expert AI assistant called Tyson AI. Answer questions about cybersecurity, hacking, malware, phishing, VPN, firewalls, CMD commands, troubleshooting, Wi-Fi security, and all IT-related topics. Respond in the same language as the user's question. Be concise, practical, and use bullet points where helpful. Limit response to 200 words.",
+            },
+            { role: "user", content: trimmed },
+          ],
+          model: "openai",
+          seed: 42,
+          private: true,
+        }),
+      });
+      clearTimeout(timeoutId);
+
+      let answer = await res.text();
+      if (!answer || answer.trim().length === 0) throw new Error("empty");
+
+      const aiMsg: Message = {
+        id: ++msgIdCounter,
+        role: "ai",
+        text: answer,
+        displayedText: "",
+        isTyping: true,
+      };
+      setIsThinking(false);
+      setMessages((prev) => [...prev, aiMsg]);
+      setTimeout(() => typeMessage(aiMsg.id, answer), 50);
+    } catch {
       const answer = findAnswer(trimmed, lang) ?? ui.fallback;
       const aiMsg: Message = {
         id: ++msgIdCounter,
@@ -381,7 +607,7 @@ export default function AIChatSection() {
       setIsThinking(false);
       setMessages((prev) => [...prev, aiMsg]);
       setTimeout(() => typeMessage(aiMsg.id, answer), 50);
-    }, 300);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -395,21 +621,92 @@ export default function AIChatSection() {
       id="ai-assistant"
       className="section-divider py-20 px-4 sm:px-6 lg:px-8"
     >
+      <style>{orbKeyframes}</style>
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
+        {/* Animated Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-10"
+          className="text-center mb-10 relative"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/30 bg-primary/5 mb-4">
+          {/* Floating orbs */}
+          <div
+            className="absolute w-24 h-24 rounded-full pointer-events-none"
+            style={{
+              background: "oklch(0.55 0.22 25 / 0.18)",
+              filter: "blur(16px)",
+              top: "-20px",
+              left: "15%",
+              animation: "floatOrb1 6s ease-in-out infinite",
+            }}
+          />
+          <div
+            className="absolute w-16 h-16 rounded-full pointer-events-none"
+            style={{
+              background: "oklch(0.55 0.18 280 / 0.15)",
+              filter: "blur(12px)",
+              top: "10px",
+              right: "18%",
+              animation: "floatOrb2 7.5s ease-in-out infinite",
+            }}
+          />
+          <div
+            className="absolute w-20 h-20 rounded-full pointer-events-none"
+            style={{
+              background: "oklch(0.55 0.20 160 / 0.12)",
+              filter: "blur(14px)",
+              bottom: "-10px",
+              left: "40%",
+              animation: "floatOrb3 9s ease-in-out infinite",
+            }}
+          />
+
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/30 bg-primary/5 mb-5">
             <Sparkles className="w-4 h-4 text-primary" />
             <span className="text-xs font-mono text-primary tracking-widest uppercase">
-              AI Powered
+              AI Powered — Real-time Support
             </span>
           </div>
+
+          {/* Bot Avatar with spinning ring + pulse glow */}
+          <div className="flex justify-center mb-4">
+            <div className="relative">
+              {/* Rotating outer ring */}
+              <div
+                className="absolute inset-0 rounded-full border-2 border-dashed border-primary/40"
+                style={{
+                  width: "88px",
+                  height: "88px",
+                  top: "-4px",
+                  left: "-4px",
+                  animation: "spinSlow 8s linear infinite",
+                }}
+              />
+              {/* Pulse glow ring */}
+              <div
+                className="w-20 h-20 rounded-full bg-primary/10 border-2 border-primary/50 flex items-center justify-center"
+                style={{ animation: "pulse-glow 2.5s ease-in-out infinite" }}
+              >
+                <Bot className="w-9 h-9 text-primary" />
+              </div>
+              {/* ONLINE badge */}
+              <div className="absolute -bottom-1 -right-1 flex items-center gap-1 bg-background border border-green-500/40 rounded-full px-2 py-0.5">
+                <span
+                  className="w-2 h-2 rounded-full bg-green-400"
+                  style={{
+                    animation: "pulse 1.5s ease-in-out infinite",
+                    boxShadow: "0 0 6px oklch(0.68 0.20 142)",
+                  }}
+                />
+                <span className="text-[10px] font-mono text-green-400 leading-none">
+                  ONLINE
+                </span>
+              </div>
+            </div>
+          </div>
+
           <h2 className="font-display font-black text-4xl md:text-5xl text-foreground mb-3 glow-text">
             {ui.title}
           </h2>
@@ -427,19 +724,29 @@ export default function AIChatSection() {
           className="flex flex-wrap justify-center gap-2 mb-6"
         >
           {LANGUAGES.map((l) => (
-            <button
+            <motion.button
               key={l.code}
               type="button"
               data-ocid="ai.tab"
               onClick={() => setLang(l.code)}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all border ${
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.95 }}
+              animate={{
+                scale: lang === l.code ? 1.05 : 1,
+                boxShadow:
+                  lang === l.code
+                    ? "0 0 16px oklch(0.55 0.22 25 / 0.6)"
+                    : "none",
+              }}
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+              className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
                 lang === l.code
-                  ? "bg-primary text-primary-foreground border-primary glow-border"
+                  ? "bg-primary text-primary-foreground border-primary"
                   : "border-border text-muted-foreground hover:border-primary/50 hover:text-foreground"
               }`}
             >
               {l.nativeLabel}
-            </button>
+            </motion.button>
           ))}
         </motion.div>
 
@@ -449,125 +756,222 @@ export default function AIChatSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="card-cyber rounded-xl border border-border overflow-hidden"
+          className="rounded-xl overflow-hidden"
+          style={{
+            animation: "borderGlow 5s ease-in-out infinite",
+            border: "1px solid",
+          }}
         >
-          {/* Terminal Header Bar */}
-          <div className="flex items-center gap-2 px-4 py-2 border-b border-border bg-background/50">
+          {/* Terminal Header Bar with matrix-rain effect */}
+          <div
+            className="flex items-center gap-2 px-4 py-2.5 border-b border-border relative overflow-hidden"
+            style={{
+              background:
+                "linear-gradient(90deg, oklch(0.12 0.02 25) 0%, oklch(0.08 0.01 25) 50%, oklch(0.12 0.02 280) 100%)",
+            }}
+          >
+            {/* Matrix background shimmer */}
+            <div
+              className="absolute inset-0 opacity-10 pointer-events-none"
+              style={{
+                backgroundImage:
+                  "repeating-linear-gradient(0deg, transparent, transparent 2px, oklch(0.55 0.22 25 / 0.3) 2px, oklch(0.55 0.22 25 / 0.3) 3px)",
+                backgroundSize: "100% 8px",
+                animation: "matrixRain 3s linear infinite",
+              }}
+            />
             <div className="w-3 h-3 rounded-full bg-destructive/70" />
             <div className="w-3 h-3 rounded-full bg-yellow-500/70" />
             <div className="w-3 h-3 rounded-full bg-primary/70" />
             <span className="ml-2 text-xs font-mono text-muted-foreground flex items-center gap-1.5">
-              <Globe className="w-3 h-3" /> tyson-ai — {currentLang.nativeLabel}
+              <Terminal className="w-3 h-3 text-primary" />
+              {" tyson-ai //"}
+              <span className="text-primary">{currentLang.nativeLabel}</span>
             </span>
+            <div className="ml-auto flex items-center gap-1">
+              <Shield className="w-3 h-3 text-green-400" />
+              <span className="text-[10px] font-mono text-green-400">
+                SECURE
+              </span>
+            </div>
           </div>
 
-          {/* Messages */}
+          {/* Messages area with scanning line */}
           <div
-            ref={scrollRef}
-            className="h-96 overflow-y-auto p-4 space-y-4 scrollbar-thin"
-            style={{ direction: isRTL ? "rtl" : "ltr" }}
+            className="relative"
+            style={{ background: "oklch(0.08 0.01 25)" }}
           >
-            {messages.length === 0 && (
-              <div
-                className="flex flex-col items-center justify-center h-full text-center gap-3"
-                data-ocid="ai.empty_state"
-              >
-                <div className="w-16 h-16 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center">
-                  <Bot className="w-8 h-8 text-primary" />
-                </div>
-                <p className="text-muted-foreground text-sm font-body max-w-xs">
-                  {ui.subtitle}
-                </p>
-              </div>
-            )}
+            {/* Scanning line animation */}
+            <div
+              className="absolute left-0 right-0 h-px pointer-events-none z-10"
+              style={{
+                background:
+                  "linear-gradient(90deg, transparent 0%, oklch(0.55 0.22 25 / 0.6) 50%, transparent 100%)",
+                animation: "scanLine 4s linear infinite",
+              }}
+            />
 
-            {messages.map((msg, i) => (
-              <motion.div
-                key={msg.id}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-                className={`flex gap-3 ${
-                  msg.role === "user"
-                    ? isRTL
-                      ? "flex-row-reverse"
-                      : "flex-row-reverse"
-                    : "flex-row"
-                }`}
-                data-ocid={`ai.item.${i + 1}`}
-              >
-                {msg.role === "ai" && (
-                  <div className="w-8 h-8 rounded-full bg-primary/15 border border-primary/30 flex items-center justify-center flex-shrink-0">
-                    <Bot className="w-4 h-4 text-primary" />
-                  </div>
-                )}
+            <div
+              ref={scrollRef}
+              className="h-96 overflow-y-auto p-4 space-y-4 scrollbar-thin"
+              style={{ direction: isRTL ? "rtl" : "ltr" }}
+            >
+              {messages.length === 0 && (
                 <div
-                  className={`max-w-[80%] rounded-xl px-4 py-2.5 text-sm font-body leading-relaxed ${
-                    msg.role === "user"
-                      ? "bg-primary/20 border border-primary/30 text-foreground ml-auto"
-                      : "bg-secondary border border-border text-foreground"
-                  }`}
-                  style={{
-                    direction: isRTL ? "rtl" : "ltr",
-                    textAlign: isRTL ? "right" : "left",
-                  }}
+                  className="flex flex-col items-center justify-center h-full text-center gap-3"
+                  data-ocid="ai.empty_state"
                 >
-                  {msg.role === "ai"
-                    ? (msg.displayedText ?? msg.text)
-                    : msg.text}
-                  {msg.role === "ai" && msg.isTyping && (
-                    <span className="inline-block w-1.5 h-4 bg-primary ml-0.5 animate-pulse align-middle" />
-                  )}
+                  <motion.div
+                    animate={{ rotate: [0, 5, -5, 0] }}
+                    transition={{
+                      duration: 3,
+                      repeat: Number.POSITIVE_INFINITY,
+                      ease: "easeInOut",
+                    }}
+                    className="w-16 h-16 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center"
+                  >
+                    <Bot className="w-8 h-8 text-primary" />
+                  </motion.div>
+                  <p className="text-muted-foreground text-sm font-mono max-w-xs">
+                    {ui.subtitle}
+                  </p>
+                  <div className="flex gap-3 flex-wrap justify-center">
+                    {[
+                      { icon: Terminal, label: "CMD" },
+                      { icon: Shield, label: "Security" },
+                      { icon: Wifi, label: "Wi-Fi" },
+                      { icon: Zap, label: "Quick Fix" },
+                    ].map(({ icon: Icon, label }) => (
+                      <div
+                        key={label}
+                        className="flex items-center gap-1 text-xs font-mono text-muted-foreground/60 border border-border/40 rounded px-2 py-1"
+                      >
+                        <Icon className="w-3 h-3 text-primary/60" />
+                        {label}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </motion.div>
-            ))}
+              )}
 
-            {isThinking && (
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex gap-3"
-                data-ocid="ai.loading_state"
-              >
-                <div className="w-8 h-8 rounded-full bg-primary/15 border border-primary/30 flex items-center justify-center flex-shrink-0">
-                  <Bot className="w-4 h-4 text-primary" />
-                </div>
-                <div className="bg-secondary border border-border rounded-xl px-4 py-2.5 flex items-center gap-1.5">
-                  <span className="text-xs text-muted-foreground font-mono mr-2">
-                    {ui.thinking}
-                  </span>
-                  {[0, 1, 2].map((d) => (
-                    <span
-                      key={d}
-                      className="w-1.5 h-1.5 rounded-full bg-primary animate-bounce"
-                      style={{ animationDelay: `${d * 150}ms` }}
-                    />
-                  ))}
-                </div>
-              </motion.div>
-            )}
+              {messages.map((msg, i) => (
+                <motion.div
+                  key={msg.id}
+                  initial={{ opacity: 0, y: 12, scale: 0.97 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ duration: 0.3 }}
+                  className={`flex gap-3 ${
+                    msg.role === "user" ? "flex-row-reverse" : "flex-row"
+                  }`}
+                  data-ocid={`ai.item.${i + 1}`}
+                >
+                  {msg.role === "ai" && (
+                    <div className="w-8 h-8 rounded-full bg-primary/15 border border-primary/30 flex items-center justify-center flex-shrink-0">
+                      <Bot className="w-4 h-4 text-primary" />
+                    </div>
+                  )}
+                  <div
+                    className={`max-w-[80%] rounded-xl px-4 py-2.5 text-sm font-mono leading-relaxed whitespace-pre-wrap ${
+                      msg.role === "user"
+                        ? "bg-primary/20 border border-primary/30 text-foreground ml-auto"
+                        : "bg-secondary border border-border text-foreground"
+                    }`}
+                    style={{
+                      direction: isRTL ? "rtl" : "ltr",
+                      textAlign: isRTL ? "right" : "left",
+                    }}
+                  >
+                    {msg.role === "ai"
+                      ? (msg.displayedText ?? msg.text)
+                      : msg.text}
+                    {msg.role === "ai" && msg.isTyping && (
+                      <span className="inline-block w-1.5 h-4 bg-primary ml-0.5 animate-pulse align-middle" />
+                    )}
+                  </div>
+                </motion.div>
+              ))}
+
+              <AnimatePresence>
+                {isThinking && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    className="flex gap-3"
+                    data-ocid="ai.loading_state"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-primary/15 border border-primary/30 flex items-center justify-center flex-shrink-0">
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{
+                          duration: 1.2,
+                          repeat: Number.POSITIVE_INFINITY,
+                          ease: "linear",
+                        }}
+                      >
+                        <Bot className="w-4 h-4 text-primary" />
+                      </motion.div>
+                    </div>
+                    <div className="bg-secondary border border-border rounded-xl px-4 py-2.5 flex items-center gap-2">
+                      <Terminal className="w-3.5 h-3.5 text-primary" />
+                      <span className="text-xs text-muted-foreground font-mono">
+                        {ui.thinking}
+                      </span>
+                      <div className="flex gap-1">
+                        {[0, 1, 2].map((d) => (
+                          <motion.span
+                            key={d}
+                            className="w-1.5 h-1.5 rounded-full bg-primary"
+                            animate={{
+                              scale: [1, 1.5, 1],
+                              opacity: [0.5, 1, 0.5],
+                            }}
+                            transition={{
+                              duration: 0.8,
+                              repeat: Number.POSITIVE_INFINITY,
+                              delay: d * 0.2,
+                            }}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
 
           {/* Suggestion Chips */}
           <div
-            className="px-4 pb-2 flex flex-wrap gap-2"
-            style={{ direction: isRTL ? "rtl" : "ltr" }}
+            className="px-4 pb-2 pt-3 flex flex-wrap gap-2 border-t border-border/40"
+            style={{
+              background: "oklch(0.09 0.01 25)",
+              direction: isRTL ? "rtl" : "ltr",
+            }}
           >
             {ui.suggestions.map((s) => (
-              <button
+              <motion.button
                 key={s}
                 type="button"
                 data-ocid="ai.secondary_button"
                 onClick={() => sendMessage(s)}
-                className="text-xs px-3 py-1 rounded-full border border-primary/30 text-primary hover:bg-primary/10 transition-colors font-mono"
+                whileHover={{
+                  scale: 1.04,
+                  backgroundColor: "oklch(0.55 0.22 25 / 0.15)",
+                }}
+                whileTap={{ scale: 0.97 }}
+                className="text-xs px-3 py-1 rounded-full border border-primary/30 text-primary hover:text-primary transition-colors font-mono"
               >
                 {s}
-              </button>
+              </motion.button>
             ))}
           </div>
 
           {/* Input Bar */}
-          <div className="p-4 pt-2 border-t border-border">
+          <div
+            className="p-4 pt-2 border-t border-border"
+            style={{ background: "oklch(0.09 0.01 25)" }}
+          >
             <div className="flex gap-2">
               <Input
                 value={input}
